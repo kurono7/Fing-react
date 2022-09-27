@@ -2,6 +2,9 @@ import http from "http";
 import express ,{ Express } from "express";
 import morgan from "morgan";
 import routes from "./routes/posts";
+import * as dotenv from "dotenv";
+
+dotenv.config({path:'../.env'});
 
 const router: Express = express();
 
@@ -35,5 +38,5 @@ router.use((req, res, next ) => {
 
 const httpServer = http.createServer(router);
 const PORT: any = process.env.PORT ?? 6060
-httpServer.listen(PORT, () => console.log(`servidor corriendo en el puerto ${PORT}` ))
+httpServer.listen(PORT, () => console.log(`Server listening ${PORT}` ))
 

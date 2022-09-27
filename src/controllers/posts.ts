@@ -10,8 +10,8 @@ interface Post {
     body: String
 }
 interface TwittSearch {
-    id:String,
-    text:String
+    id: String,
+    text: String
 }
 
 const client = new TwitterApi({
@@ -52,9 +52,9 @@ const postTwitts = async (req: Request, res: Response, next: NextFunction) => {
         //const downloadFile = await getItem("cloud-object-storage-uk-cos-archive-5f8","CASO_090/Imágenes/Hechos/IMG_7708.jpg")
         let query = req.body.text;
         let result: AxiosResponse = await client.v2.get('tweets/search/recent', { query: query, max_results: 100 });
-        let twits:[TwittSearch] = result.data;
+        let twits: [TwittSearch] = result.data;
         return res.status(200).json({
-            message:twits
+            message: twits
         })
     } catch (e) {
         return res.status(404).json({
@@ -64,63 +64,46 @@ const postTwitts = async (req: Request, res: Response, next: NextFunction) => {
 }
 
 const getImage = async (req: Request, res: Response, next: NextFunction) => {
-    const downloadFile = await getItem("cloud-object-storage-uk-cos-archive-5f8","CASO_090/Imágenes/Hechos/IMG_7708.jpg");
+    const downloadFile = await getItem("cloud-object-storage-uk-cos-archive-5f8", "CASO_090/Imágenes/Hechos/IMG_7708.jpg");
     return res.status(200).json({
         downloadFile
     })
 }
 
-
-async function test() {
-    var params = {Bucket: 'cloud-object-storage-uk-cos-archive-5f8', Expires: 60};
-    var url = connS3.getSignedUrl('CASO_090/Imágenes/Hechos/IMG_7708.jpg', params);
-    console.log('The URL is', url)
-    
-}
-
-
-
-async function getBucketContents(bucketName:string) {
+async function getBucketContents(bucketName: string) {
     console.log(`Retrieving bucket contents from: ${bucketName}`);
     return connS3.listObjects(
-        {Bucket: bucketName},
+        { Bucket: bucketName },
     ).promise()
-    .then((data) => {
-        if (data != null && data.Contents != null) {
-            for (var i = 0; i < data.Contents.length; i++) {
-                var itemKey = data.Contents[i].Key;
-                var itemSize = data.Contents[i].Size;
-                console.log(`Item: ${itemKey} (${itemSize} bytes).`)
+        .then((data) => {
+            if (data != null && data.Contents != null) {
+                for (var i = 0; i < data.Contents.length; i++) {
+                    var itemKey = data.Contents[i].Key;
+                    var itemSize = data.Contents[i].Size;
+                    console.log(`Item: ${itemKey} (${itemSize} bytes).`)
+                }
             }
-        }    
-    })
-    .catch((e) => {
-        console.error(`ERROR: ${e.code} - ${e.message}\n`);
-    });
+        })
+        .catch((e) => {
+            console.error(`ERROR: ${e.code} - ${e.message}\n`);
+        });
 }
 
-async function getItem(bucketName:string, itemName:any) {
+async function getItem(bucketName: string, itemName: any) {
     console.log(`Retrieving item from bucket: ${bucketName}, key: ${itemName}`);
     return connS3.getObject({
-        Bucket: bucketName, 
+        Bucket: bucketName,
         Key: itemName
     }).promise()
-    .then((data:any) => {
-        if (data != null) {
-            //console.log('File Contents: ' + Buffer.from(data.Body));
-           const ima = Buffer.from(data.Body,'binary').toString('base64');
-            return `data:image/jpeg;base64,${ima}`
-//              Buffer.from(data.Body,'base64').toString();
-
-//             const buf2 = Buffer.from(body, 'binary');
-//   const data2 = buf2.toString('base64');
-//   console.log(`data:image/jpeg;base64,${data2}`);
-            //console.log('File Contents: ' + Buffer.from(data.Body).toString());
-        }    
-    })
-    .catch((e) => {
-        console.error(`ERROR: ${e.code} - ${e.message}\n`);
-    });
+        .then((data: any) => {
+            if (data != null) {
+                const ima = Buffer.from(data.Body, 'binary').toString('base64');
+                return `data:image/jpeg;base64,${ima}`
+            }
+        })
+        .catch((e) => {
+            console.error(`ERROR: ${e.code} - ${e.message}\n`);
+        });
 }
 
-export default { getPosts, postTwitts,getImage }
+export default { getPosts, postTwitts, getImage }
