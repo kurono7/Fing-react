@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "nodemon src/server.ts",
     "start":"tsc && node dist/server.js",
-    "build": "rm -rf dist/ && prettier --write source/ && tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
