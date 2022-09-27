@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import axios, { AxiosResponse } from "axios";
 import { TwitterApi } from 'twitter-api-v2';
+import IBM from "ibm-cos-sdk";
 
 interface Post {
     userId: Number,
@@ -8,14 +9,6 @@ interface Post {
     tittle: String,
     body: String
 }
-
-interface Client {
-    appKey: String,
-    appSecret: String,
-    accessToken: String,
-    accessSecret: String
-}
-
 interface TwittSearch {
     id:String,
     text:String
@@ -28,6 +21,15 @@ const client = new TwitterApi({
     accessSecret: 'L4rdwfjue9QogiGEvRb87X2RE2FrbeAGXjrwog6VucZdY'
 })
 
+const config = {
+    endpoint: 's3.us-south.cloud-object-storage.appdomain.cloud',
+    apiKeyId: 'lK0cAlHjB1UiHa3mVqA-njqNJylGPMl-g1JsGH7_ifop',
+    serviceInstanceId: 'crn:v1:bluemix:public:cloud-object-storage:global:a/5d969b6a581645c1be2f6edf3d3bfe63:28648e68-c444-4de6-b0cf-1bbe41cb0bc1::',
+    signatureVersion: 'iam',
+};
+
+
+const connS3 = new IBM.S3(config);
 
 const getPosts = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -46,6 +48,8 @@ const getPosts = async (req: Request, res: Response, next: NextFunction) => {
 
 const postTwitts = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        //const dataBucket = await getBucketContents("cloud-object-storage-uk-cos-archive-5f8");
+        //const downloadFile = await getItem("cloud-object-storage-uk-cos-archive-5f8","CASO_090/Imágenes/Hechos/IMG_7708.jpg")
         let query = req.body.text;
         let result: AxiosResponse = await client.v2.get('tweets/search/recent', { query: query, max_results: 100 });
         let twits:[TwittSearch] = result.data;
@@ -59,4 +63,64 @@ const postTwitts = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
-export default { getPosts, postTwitts }
+const getImage = async (req: Request, res: Response, next: NextFunction) => {
+    const downloadFile = await getItem("cloud-object-storage-uk-cos-archive-5f8","CASO_090/Imágenes/Hechos/IMG_7708.jpg");
+    return res.status(200).json({
+        downloadFile
+    })
+}
+
+
+async function test() {
+    var params = {Bucket: 'cloud-object-storage-uk-cos-archive-5f8', Expires: 60};
+    var url = connS3.getSignedUrl('CASO_090/Imágenes/Hechos/IMG_7708.jpg', params);
+    console.log('The URL is', url)
+    
+}
+
+
+
+async function getBucketContents(bucketName:string) {
+    console.log(`Retrieving bucket contents from: ${bucketName}`);
+    return connS3.listObjects(
+        {Bucket: bucketName},
+    ).promise()
+    .then((data) => {
+        if (data != null && data.Contents != null) {
+            for (var i = 0; i < data.Contents.length; i++) {
+                var itemKey = data.Contents[i].Key;
+                var itemSize = data.Contents[i].Size;
+                console.log(`Item: ${itemKey} (${itemSize} bytes).`)
+            }
+        }    
+    })
+    .catch((e) => {
+        console.error(`ERROR: ${e.code} - ${e.message}\n`);
+    });
+}
+
+async function getItem(bucketName:string, itemName:any) {
+    console.log(`Retrieving item from bucket: ${bucketName}, key: ${itemName}`);
+    return connS3.getObject({
+        Bucket: bucketName, 
+        Key: itemName
+    }).promise()
+    .then((data:any) => {
+        if (data != null) {
+            //console.log('File Contents: ' + Buffer.from(data.Body));
+           const ima = Buffer.from(data.Body,'binary').toString('base64');
+            return `data:image/jpeg;base64,${ima}`
+//              Buffer.from(data.Body,'base64').toString();
+
+//             const buf2 = Buffer.from(body, 'binary');
+//   const data2 = buf2.toString('base64');
+//   console.log(`data:image/jpeg;base64,${data2}`);
+            //console.log('File Contents: ' + Buffer.from(data.Body).toString());
+        }    
+    })
+    .catch((e) => {
+        console.error(`ERROR: ${e.code} - ${e.message}\n`);
+    });
+}
+
+export default { getPosts, postTwitts,getImage }

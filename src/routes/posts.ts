@@ -6,4 +6,6 @@ router.get('/posts', controller.getPosts);
 
 router.post('/getSearchTwits', controller.postTwitts);
 
+router.get('/getImage',controller.getImage);
+
 export = router;
