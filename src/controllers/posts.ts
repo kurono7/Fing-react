@@ -36,7 +36,10 @@ const getPosts = async (req: Request, res: Response, next: NextFunction) => {
         let result: AxiosResponse = await axios.get(`https://jsonplaceholder.typicode.com/posts`);
         let posts: [Post] = result.data;
         return res.status(200).json({
-            message: posts
+            data: {
+                messages: posts
+            },
+            component: "redes"
         })
     } catch (e) {
         return res.status(404).json({
@@ -50,11 +53,14 @@ const postTwitts = async (req: Request, res: Response, next: NextFunction) => {
     try {
         //const dataBucket = await getBucketContents("cloud-object-storage-uk-cos-archive-5f8");
         //const downloadFile = await getItem("cloud-object-storage-uk-cos-archive-5f8","CASO_090/Imágenes/Hechos/IMG_7708.jpg")
-        let query = req.body.text;
+        let query = "zenaida serna";
         let result: AxiosResponse = await client.v2.get('tweets/search/recent', { query: query, max_results: 100 });
         let twits: [TwittSearch] = result.data;
         return res.status(200).json({
-            message: twits
+            data: {
+                messages: twits
+            },
+            component: "redes"
         })
     } catch (e) {
         return res.status(404).json({
