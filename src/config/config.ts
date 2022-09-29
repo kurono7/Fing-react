@@ -1,32 +1,52 @@
-import * as dotenv from "dotenv";
+import { TwitterApi } from 'twitter-api-v2';
+import DiscoveryV2 from "ibm-watson/discovery/v2";
+import { IamAuthenticator } from "ibm-watson/auth";
+import dotenv from "dotenv";
+//import DiscoveryV1 from 'ibm-watson/discovery/v1';
 
-export abstract class configServer {
-    constructor() {
-        const nodeNameEnv = this.createPathEnv(this.nodeEnv);
-        dotenv.config({
-            path: nodeNameEnv
-        });
-    }
+dotenv.config()
 
-    public getEnviroment(key: string) {
-        return process.env[key]
-    }
+//
+const appKey = String(process.env.APPKEYTWITTER);
+const appSecret = String(process.env.APPSECRET);
+const accessToken = String(process.env.ACCESSTOKEN);
+const accessSecret = String(process.env.ACCESSSECRET);
 
-    public getNumberEnv(key: string) {
-        return Number(this.getEnviroment(key));
-    }
 
-    public get nodeEnv(): string {
-        return this.getEnviroment('NODE_ENV')?.trim() || "";
-    }
+//
+const endpoint = String(process.env.ENDPOINT);
+const apiKeyId = String(process.env.APIKEYID);
+const serviceInstanceId = String(process.env.SERVICE_INSTANCE);
+const signatureVersion = String(process.env.SIGNATURE);
 
-    public createPathEnv(path: string): string {
-        const arrEnv: Array<string> = ['env']
-        if (path.length > 0) {
-            const stringToArray = path.split('.')
-            arrEnv.unshift(...stringToArray)
-        }
-        return "." + arrEnv.join('.');
-    }
-}
+//
 
+const serviceUrl = String(process.env.SERVICE_URL);
+const keyDiscovery = String(process.env.KEY_DISCOVERY);
+
+
+
+export const clientTwitter = new TwitterApi({
+    appKey: appKey,
+    appSecret: appSecret,
+    accessToken: accessToken,
+    accessSecret: accessSecret
+});
+
+
+export const configS3 = {
+    endpoint: endpoint,
+    apiKeyId: apiKeyId,
+    serviceInstanceId: serviceInstanceId,
+    signatureVersion: signatureVersion,
+};
+
+
+export const discovery = new DiscoveryV2({
+    version: '2019-02-01',
+    authenticator: new IamAuthenticator({
+        apikey: keyDiscovery,
+    }),
+    serviceUrl: serviceUrl,
+    disableSslVerification: true,
+});

@@ -1,0 +1,47 @@
+{
+    "Expedientes": [
+        {
+            "id": 1,
+            "consecutivo": 1896,
+            "victima": "Zenaida Serna Arriega",
+            "Ciudad": "Cartagena",
+            "lugar": "Pozon",
+            "Estudios:": "base de opinión pericial que conlleva análisis de escena, de evidencia comportamental,descripción relación víctima y victimario, desarrollo probable del antes, durante y después del hecho criminal, la descripción del tipo de violencia empleada y como evidencia demostrativa de la escena y la dinámica probable del hecho criminal",
+            "ano": 2016,
+            "imagenes":[
+                {
+                    "nombre":"IMG_7708.jpg",
+                    "alt":"Foto 1"
+                },
+                {
+                    "nombre":"IMG_7713",
+                    "alt":"Foto 2"
+
+                },
+                {
+                    "nombre":"IMG_7708.jpg",
+                    "alt":"Foto 3 "
+
+                },
+                {
+                    "nombre":"IMG_8129.JPG",
+                    "alt":"Foto 4"
+
+                },
+                {
+                    "nombre":"IMG_8131.JPG",
+                    "alt":""
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "consecutivo": 1897,
+            "victima": "Test",
+            "Ciudad": "Cartagena",
+            "lugar": "Pozon",
+            "Estudios:": "base de opinión pericial que conlleva análisis de escena, de evidencia comportamental,descripción relación víctima y victimario, desarrollo probable del antes, durante y después del hecho criminal, la descripción del tipo de violencia empleada y como evidencia demostrativa de la escena y la dinámica probable del hecho criminal",
+            "ano": 2016
+        }
+    ]
+}

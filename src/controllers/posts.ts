@@ -1,52 +1,60 @@
 import { Request, Response, NextFunction } from "express";
 import axios, { AxiosResponse } from "axios";
-import { TwitterApi } from 'twitter-api-v2';
 import IBM from "ibm-cos-sdk";
+import { clientTwitter, configS3, discovery } from "../config/config";
+//import DiscoveryV2 from "ibm-watson/discovery/v2";
+//import IamAuthenticator from 'ibm-watson/auth';
 
-interface Post {
-    userId: Number,
-    id: Number,
-    tittle: String,
-    body: String
-}
 interface TwittSearch {
     id: String,
     text: String
 }
 
-const client = new TwitterApi({
-    appKey: 'LeYiKaHCGCcNzuflzEVX7UVCp',
-    appSecret: 'PAcYRY665YHVBYr6JcPEpqbjbcFOxE8WyDEzFV5CwC1DkVGMX7',
-    accessToken: '901500680015409152-i2zro9cMyw8YWthC3JHy0b8PgcDm6m9',
-    accessSecret: 'L4rdwfjue9QogiGEvRb87X2RE2FrbeAGXjrwog6VucZdY'
-})
-
-const config = {
-    endpoint: 's3.us-south.cloud-object-storage.appdomain.cloud',
-    apiKeyId: 'lK0cAlHjB1UiHa3mVqA-njqNJylGPMl-g1JsGH7_ifop',
-    serviceInstanceId: 'crn:v1:bluemix:public:cloud-object-storage:global:a/5d969b6a581645c1be2f6edf3d3bfe63:28648e68-c444-4de6-b0cf-1bbe41cb0bc1::',
-    signatureVersion: 'iam',
-};
+const connS3 = new IBM.S3(configS3);
 
 
-const connS3 = new IBM.S3(config);
-
-const getPosts = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        let result: AxiosResponse = await axios.get(`https://jsonplaceholder.typicode.com/posts`);
-        let posts: [Post] = result.data;
-        return res.status(200).json({
-            data: {
-                messages: posts
-            },
-            component: "redes"
-        })
-    } catch (e) {
-        return res.status(404).json({
-            message: e
-        })
+const getResponse = async (req: Request, res: Response, next: NextFunction) => {
+    let { type, message } = req.body;
+    switch (type) {
+        case "discovery":
+            const resultDiscovery = await getDiscoveryMessage(message);
+            return res.status(200).json({
+                message: resultDiscovery,
+                component: "redes"
+            })
+            break;
+        case "buscar":
+            return res.status(200).json({
+                data:{
+                    message:"prueba",
+                },
+                component: "redes"
+            })
+            break;
+        case 2: ""
+            break;
+        default: ""
+            break;
     }
 }
+
+
+async function getDiscoveryMessage(params: string) {
+    try {
+        const params = {
+            projectId: '26595ce8-835b-4d5e-a6c8-3f4b873fcf9d',
+            query: 'text:senaida',
+        };
+        const response: any = await (await discovery.query(params)).result;
+        return response.results[0].text
+    } catch (e) {
+        return e;
+    }
+
+}
+
+
+
 
 
 const postTwitts = async (req: Request, res: Response, next: NextFunction) => {
@@ -54,7 +62,7 @@ const postTwitts = async (req: Request, res: Response, next: NextFunction) => {
         //const dataBucket = await getBucketContents("cloud-object-storage-uk-cos-archive-5f8");
         //const downloadFile = await getItem("cloud-object-storage-uk-cos-archive-5f8","CASO_090/Imágenes/Hechos/IMG_7708.jpg")
         let query = "zenaida serna";
-        let result: AxiosResponse = await client.v2.get('tweets/search/recent', { query: query, max_results: 100 });
+        let result: AxiosResponse = await clientTwitter.v2.get('tweets/search/recent', { query: query, max_results: 100 });
         let twits: [TwittSearch] = result.data;
         return res.status(200).json({
             data: {
@@ -71,9 +79,19 @@ const postTwitts = async (req: Request, res: Response, next: NextFunction) => {
 
 const getImage = async (req: Request, res: Response, next: NextFunction) => {
     const downloadFile = await getItem("cloud-object-storage-uk-cos-archive-5f8", "CASO_090/Imágenes/Hechos/IMG_7708.jpg");
+    await bucleImage();
     return res.status(200).json({
         downloadFile
     })
+}
+
+async function bucleImage() {
+    const images = ["CASO_090/Imágenes/Hechos/IMG_7708.jpg", "CASO_090/Imágenes/Hechos/IMG_7713.JPG", "CASO_090/Imágenes/Hechos/IMG_7953.JPG"];
+
+    const results: string[] = await Promise.all(images.map(async (item): Promise<string> => {
+        const data = await getItem("cloud-object-storage-uk-cos-archive-5f8", item);
+        return item;
+    }));
 }
 
 async function getBucketContents(bucketName: string) {
@@ -112,4 +130,4 @@ async function getItem(bucketName: string, itemName: any) {
         });
 }
 
-export default { getPosts, postTwitts, getImage }
+export default { postTwitts, getImage, getResponse }
