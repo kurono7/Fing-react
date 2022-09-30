@@ -1,9 +1,8 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, text } from "express";
 import axios, { AxiosResponse } from "axios";
 import IBM from "ibm-cos-sdk";
 import { clientTwitter, configS3, discovery } from "../config/config";
-//import DiscoveryV2 from "ibm-watson/discovery/v2";
-//import IamAuthenticator from 'ibm-watson/auth';
+import info from "../data.json";
 
 interface TwittSearch {
     id: String,
@@ -19,23 +18,37 @@ const getResponse = async (req: Request, res: Response, next: NextFunction) => {
         case "discovery":
             const resultDiscovery = await getDiscoveryMessage(message);
             return res.status(200).json({
-                message: resultDiscovery,
-                component: "redes"
+                message: resultDiscovery
             })
             break;
         case "buscar":
             return res.status(200).json({
                 data:{
-                    message:"prueba",
+                    message:info.Expedientes,
                 },
-                component: "redes"
             })
             break;
-        case 2: ""
+        case "expediente":
+        const data = await  buscarCaso()   
+        return res.status(200).json({
+            data
+        })
+        break;
+        case "twitter":
+            const resTwits = await getTwits(message);
+            return res.status(200).json({
+                resTwits
+            })
             break;
         default: ""
             break;
     }
+}
+
+
+async function buscarCaso(){
+    const expediente = info.Expedientes[0]; 
+    return expediente;
 }
 
 
@@ -54,7 +67,13 @@ async function getDiscoveryMessage(params: string) {
 }
 
 
-
+async function  getTwits(params:string) {
+    let query = params;
+    console.log(query)
+    let result: AxiosResponse = await clientTwitter.v2.get('tweets/search/recent', { query: query,max_results: 100 });
+    let twits: [TwittSearch] = result.data;
+    return twits;
+}
 
 
 const postTwitts = async (req: Request, res: Response, next: NextFunction) => {
