@@ -1,0 +1,39 @@
+{
+    "data": {
+        "id": 1,
+        "ano": 2016,
+        "text": "base de opinión pericial que conlleva análisis de escena, de evidencia comportamental,descripción relación víctima y victimario, desarrollo probable del antes, durante y después del hecho criminal, la descripción del tipo de violencia empleada y como evidencia demostrativa de la escena y la dinámica probable del hecho criminal",
+        "lugar": "Pozon",
+        "Ciudad": "Cartagena",
+        "options": [
+            {
+                "label": "1. Recrear imagenes del caso",
+                "value": "Recrear imagenes del caso"
+            },
+            {
+                "label": "2. Mostrar zona del hecho",
+                "value": " Mostrar zona del hecho"
+            },
+            {
+                "label": "3. Buscar Información en periodicos",
+                "value": "Buscar Información en periodicos"
+            },
+            {
+                "label": "4. Buscar Información en redes",
+                "value": " Buscar Información en redes"
+            },
+            {
+                "label": "5. Buscar incidentes del victimario",
+                "value": "Buscar incidentes del victimario"
+            },
+            {
+                "label": "4. Regresar",
+                "value": " reresar"
+            }
+        ],
+        "victima": "Zenaida Serna Arriega",
+        "message:": "base",
+        "consecutivo": 1896
+    },
+    "component": "respuesta"
+}

@@ -4,6 +4,8 @@ import IBM from "ibm-cos-sdk";
 import { clientTwitter, configS3, discovery } from "../config/config";
 import info from "../data.json";
 
+
+//interface
 interface TwittSearch {
     id: String,
     text: String
@@ -70,7 +72,7 @@ async function getDiscoveryMessage(params: string) {
 async function  getTwits(params:string) {
     let query = params;
     console.log(query)
-    let result: AxiosResponse = await clientTwitter.v2.get('tweets/search/recent', { query: query,max_results: 100 });
+    let result: AxiosResponse = await clientTwitter.v2.get('tweets/search/recent', { query: 'zenaida_serna',max_results: 100 });
     let twits: [TwittSearch] = result.data;
     return twits;
 }
@@ -81,7 +83,8 @@ const postTwitts = async (req: Request, res: Response, next: NextFunction) => {
         //const dataBucket = await getBucketContents("cloud-object-storage-uk-cos-archive-5f8");
         //const downloadFile = await getItem("cloud-object-storage-uk-cos-archive-5f8","CASO_090/Imágenes/Hechos/IMG_7708.jpg")
         let query = "zenaida serna";
-        let result: AxiosResponse = await clientTwitter.v2.get('tweets/search/recent', { query: query, max_results: 100 });
+       // let result: AxiosResponse = await clientTwitter.v2.get('tweets/search/recent', { query: query, max_results: 100 });
+       let result = await clientTwitter.v2.get('search/tweets',{ query:'#ios #swift', max_results: 100})
         let twits: [TwittSearch] = result.data;
         return res.status(200).json({
             data: {
